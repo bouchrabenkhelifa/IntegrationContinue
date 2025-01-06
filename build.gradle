@@ -19,8 +19,7 @@ repositories {
 dependencies {
   testImplementation 'io.cucumber:cucumber-java:6.0.0'
   testImplementation 'io.cucumber:cucumber-junit:6.0.0'
-  testImplementation 'junit:junit:4.12'
-  implementation 'com.sendgrid:sendgrid-java:4.9.3'
+  testImplementation 'junit:junit:4.13.1'
 }
 cucumberReports {
   outputDir = file('build/reports/cucumber')
@@ -32,26 +31,13 @@ test {
   systemProperty 'cucumber.plugin', 'json:reports/example-report.json'
 }
 
-
-
-
-
-sonarqube {
-  properties {
-    property "sonar.projectName", "TP7_nina"  // Nom du projet
-    property "sonar.host.url", "http://localhost:9000"  // URL de votre instance SonarQube
-    property "sonar.login", "admin"
-    property "sonar.password", "admin"
-
-  }
-}
 publishing {
   repositories {
     maven {
-      url = uri('https://mymavenrepo.com/repo/83mgFPDHf3YDWmJwvOIl/')
+      url 'https://mymavenrepo.com/repo/DzRwbNwHrvQ5O9gyPKJi/'
       credentials {
-        username = 'myMavenRepo'  // Replace with your actual username
-        password = 'thanina' // Replace with your actual password
+        username 'myMavenRepo'
+        password '1234'
       }
     }
   }
@@ -70,7 +56,6 @@ task generateJavadoc(type: Javadoc) {
 
 
 
-tasks.test.finalizedBy(tasks.sonarqube)
 
 
 // Slack notification task
