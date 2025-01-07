@@ -26,13 +26,16 @@ pipeline {
             }
         }
 */
-stage('Build') {
-    steps {
-        script {
-            bat 'gradlew.bat jar'
-            bat 'gradlew.bat javadoc'
+ stage('Build Jar') {
+            steps {
+                bat 'gradlew build'
+            }
         }
-    }
+        stage('Generate Documentation') {
+            steps {
+                bat 'gradlew generateJavadoc'
+            }
+        }
 
 
 
