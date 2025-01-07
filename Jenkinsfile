@@ -40,6 +40,13 @@ pipeline {
                 bat 'gradlew generateJavadoc'
             }
         }
+           stage('Archive Artifacts') {
+                    steps {
+                        archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                        archiveArtifacts artifacts: 'build/docs/javadoc/**/*', fingerprint: true
+                    }
+                }
+
 
         stage('Deploy') {
             steps {
