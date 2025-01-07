@@ -28,7 +28,7 @@ cucumberReports {
 }
 sonarqube {
   properties {
-    property "sonar.projectName", "jenkins"  // Nom du projet
+    property "sonar.projectname", "jenkins"
     property "sonar.host.url", "http://localhost:9000/"  // URL de votre instance SonarQube
     property "sonar.login", "admin"
     property "sonar.password", "root"
