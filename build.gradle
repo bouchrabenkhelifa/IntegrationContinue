@@ -30,8 +30,11 @@ sonarqube {
   properties {
     property "sonar.projectname", "jenkins"
     property "sonar.host.url", "http://localhost:9000/"  // URL de votre instance SonarQube
-    property "sonar.login", "admin"
-    property "sonar.password", "root"
+    property "sonar.login", "squ_8a2e600ba818580b3e12c964a9885a74fef7f408"
+    property "sonar.qualitygate.wait", "true"
+    property "sonar.qualitygate.timeout", "300"
+    property "sonar.ws.timeout", "300"
+    property "sonar.ce.timeout", "300"
 
   }
 }

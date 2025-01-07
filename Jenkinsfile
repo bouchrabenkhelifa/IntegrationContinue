@@ -15,6 +15,18 @@ pipeline {
                 }
             }
         }
+        stage("Code Quality") {
+            steps {
+                script {
+                    timeout(time: 3, unit: 'MINUTES') {
+                        def qg = waitForQualityGate(webhookSecretId: 'webhook-secret')
+                        if (qg.status != 'OK') {
+                            error "Quality Gate failed: ${qg.status}"
+                        }
+                    }
+                }
+            }
+        }
 
         /* Uncomment this section if quality gate check is required
         stage('Code Quality') {
