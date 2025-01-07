@@ -36,7 +36,13 @@ pipeline {
                 bat 'gradlew generateJavadoc'
             }
         }
-
+  stage('Deploy') {
+            steps {
+                script {
+                    bat 'gradlew.bat publish'
+                }
+            }
+        }
 
 
 
