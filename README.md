@@ -1,1 +1,1 @@
-Ce dépôt contient la configuration et les scripts nécessaires pour mettre en place une intégration continue (CI) avec Jenkins. L'objectif de ce projet est d'automatiser le processus de test, de construction et de déploiement de l'application via Jenkins, permettant ainsi d'améliorer la qualité du code, la productivité des développeurs et de garantir des livraisons sans erreur.
+
