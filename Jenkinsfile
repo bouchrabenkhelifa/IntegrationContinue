@@ -1,23 +1,31 @@
 pipeline {
-agent any
-stages {
- stage('Test') {
-     steps {
+    agent any
 
-         bat './gradlew test'
-         junit '**/build/test-results/test/*.xml'
-         archiveArtifacts artifacts: '**/build/test-results/test/*.xml', allowEmptyArchive: true
-         cucumber buildStatus: 'UNSTABLE',
-                                  reportTitle: 'CucumberReport',
-                                  fileIncludePattern: 'reports/example-report.json',
-                                  trendsLimit: 10,
-                                  classifications: [
-                                        [
-                                             'key': 'Browser',
-                                             'value': 'Firefox'
-                                        ]
-                                  ]
-     }
+    stages {
+        stage('Run Tests') {
+            steps {
+                bat 'gradlew test'
+            }
+        }
 
-}
-}}
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('bouchra') {
+                    bat 'gradlew sonarqube'
+                }
+            }
+        }
+        stage('Code Quality') {
+            steps {
+                script {
+                    def qualityGate = waitForQualityGate()
+                    if (qualityGate.status != 'OK') {
+                        error "Pipeline failed due to Quality Gate failure: ${qualityGate.status}"
+                    }
+                }
+            }
+        }
+
+
+
+
