@@ -44,14 +44,31 @@ pipeline {
             }
         }
 
+ post {
+       success {
+          sendMail{
+              smtpServer{
+                  host="smtp.gmail.com"
+                  port= 587
+                  user="lb_benkhelifa@esi.dz"
+                  password="qryt mdhh cxok nhdj"
+              }
+              mail {
+                  from="lb_benkhelifa@esi.dz"
+                  to = 'lb_benkhelifa@esi.dz'
+                  body="déploiment est terminé"
+              }
+
+          }
 
 
 
+}}
+}
+}
 
 
 
-        }
-        }
 
 
 
