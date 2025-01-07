@@ -15,19 +15,19 @@ pipeline {
                 }
             }
         }
-
         stage("Quality Gate") {
             steps {
                 script {
                     timeout(time: 3, unit: 'MINUTES') {
                         def qg = waitForQualityGate(webhookSecretId: 'webhook-secret')
                         if (qg.status != 'OK') {
-                            error "Quality Gate failed: ${qg.status}"
+                            error "Quality Gate a échoué: ${qg.status}"
                         }
                     }
                 }
             }
         }
+
 
         stage('Build Jar') {
             steps {
@@ -40,13 +40,13 @@ pipeline {
                 bat 'gradlew generateJavadoc'
             }
         }
+           stage('Archivage') {
+                    steps {
+                        archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                        archiveArtifacts artifacts: 'build/docs/javadoc/**/*', fingerprint: true
+                    }
+                }
 
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
-                archiveArtifacts artifacts: 'build/docs/javadoc/**/*', fingerprint: true
-            }
-        }
 
         stage('Deploy') {
             steps {
@@ -55,46 +55,33 @@ pipeline {
                 }
             }
         }
-
-        stage('Send Mail') {
-            steps {
-                script {
-                    emailext(
-                        subject: "Build Success: ${currentBuild.fullDisplayName}",
-                        body: """Build succeeded!""",
-                        to: 'lb_benkhelifa@esi.dz',
-                        mimeType: 'text/html',
-                        attachLog: true
-                    )
-                    echo "Email notification sent"
-                }
-            }
-        }
-
-        stage('Send Slack Notification') {
-            steps {
-                script {
-                    slackSend(
-                        channel: '#jenkinsslack',
-                        color: 'good',
-                        message: 'Deployment succeeded for project!'
-                    )
-                }
-            }
-        }
     }
 
     post {
-        failure {
-            stage('Failure Notification') {
-                steps {
-                    slackSend(
-                        channel: '#jenkinsslack',
-                        color: 'danger',
-                        message: 'Deployment failed for project!'
+        success {
+            script {
+             emailext (
+                   subject: "Build Success: ${currentBuild.fullDisplayName}",
+                   body: """Build succeeded!""",
+                   to: 'lb_benkhelifa@esi.dz',
+                   mimeType: 'text/html',
+                   attachLog: true
+                   )
+                      echo "Email envoyé"
+                   }
+
+             slackSend(
+                    channel: '#jenkinsslack',
+                    color: 'good',
+                    message: 'Deployment avec succés'
                     )
-                }
-            }
+                     }
+        failure {
+                slackSend(
+                channel: '#jenkinsslack',
+                color: 'danger',
+                message: 'Deployment a échoué '
+            )
         }
     }
 }
