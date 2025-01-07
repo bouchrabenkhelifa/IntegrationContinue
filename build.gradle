@@ -35,7 +35,6 @@ sonarqube {
 
   }
 }
-
 test {
   systemProperty 'cucumber.plugin', 'json:reports/example-report.json'
 }
