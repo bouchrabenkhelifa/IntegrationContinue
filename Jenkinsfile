@@ -48,35 +48,50 @@ pipeline {
                 }
             }
         }
-
-        stage('Send Slack Notification') {
-            steps {
-                script {
-                    if (currentBuild.result == 'SUCCESS') {
-                        slackSend(
-                            channel: '#jenkinsslack',
-                            color: 'good',
-                            message: 'Deployment succeeded for project!'
-                        )
-                    } else {
-                        slackSend(
-                            channel: '#jenkinsslack',
-                            color: 'danger',
-                            message: 'Deployment failed for project!'
-                        )
-                    }
-                }
-            }
-        }
     }
 
     post {
-        // Optional: You can keep these for additional notifications if needed
         success {
-            echo "Pipeline completed successfully."
+            /* Uncomment this section if email notifications are required
+            mail(
+                to: 'lb_benkhelifa@esi.dz',
+                subject: 'Deployment Success - Project last',
+                body: 'The deployment for the project was successful.'
+            )
+
+
+            */
+            script {
+                            emailext (
+                                subject: "Build Success: ${currentBuild.fullDisplayName}",
+                                body: """
+                                    Build succeeded!
+                                """,
+                                to: 'lb_benkhelifa@esi.dz',
+                                mimeType: 'text/html',
+                                attachLog: true
+                            )
+                            echo "Email notification sent"
+                        }
+            slackSend(
+                channel: '#jenkinsslack',
+                color: 'good',
+                message: 'Deployment succeeded for project!'
+            )
         }
         failure {
-            echo "Pipeline failed. Check logs for details."
+            /* Uncomment this section if email notifications are required
+            mail(
+                to: 'lb_benkhelifa@esi.dz',
+                subject: 'Pipeline Failed - Project last',
+                body: 'The Jenkins pipeline for project has failed. Please check the logs for more details.'
+            )
+            */
+            slackSend(
+                channel: '#jenkinsslack',
+                color: 'danger',
+                message: 'Deployment failed for project!'
+            )
         }
     }
 }
