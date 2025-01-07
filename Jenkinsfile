@@ -15,6 +15,7 @@ pipeline {
                 }
             }
         }
+
         stage("Quality Gate") {
             steps {
                 script {
@@ -28,7 +29,6 @@ pipeline {
             }
         }
 
-
         stage('Build Jar') {
             steps {
                 bat 'gradlew build'
@@ -40,13 +40,13 @@ pipeline {
                 bat 'gradlew generateJavadoc'
             }
         }
-           stage('Archivage') {
-                    steps {
-                        archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
-                        archiveArtifacts artifacts: 'build/docs/javadoc/**/*', fingerprint: true
-                    }
-                }
 
+        stage('Archivage') {
+            steps {
+                archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                archiveArtifacts artifacts: 'build/docs/javadoc/**/*', fingerprint: true
+            }
+        }
 
         stage('Deploy') {
             steps {
@@ -55,33 +55,37 @@ pipeline {
                 }
             }
         }
+
+        stage('Notification') {
+            steps {
+                script {
+                    emailext(
+                        subject: "Build Success: ${currentBuild.fullDisplayName}",
+                        body: """Build succeeded!""",
+                        to: 'lb_benkhelifa@esi.dz',
+                        mimeType: 'text/html',
+                        attachLog: true
+                    )
+                    echo "Email envoyé"
+                    slackSend(
+                        channel: '#jenkinsslack',
+                        color: 'good',
+                        message: 'Deployment avec succès'
+                    )
+                }
+            }
+        }
     }
 
     post {
-        success {
-            script {
-             emailext (
-                   subject: "Build Success: ${currentBuild.fullDisplayName}",
-                   body: """Build succeeded!""",
-                   to: 'lb_benkhelifa@esi.dz',
-                   mimeType: 'text/html',
-                   attachLog: true
-                   )
-                      echo "Email envoyé"
-                   }
-
-             slackSend(
-                    channel: '#jenkinsslack',
-                    color: 'good',
-                    message: 'Deployment avec succés'
-                    )
-                     }
         failure {
+            script {
                 slackSend(
-                channel: '#jenkinsslack',
-                color: 'danger',
-                message: 'Deployment a échoué '
-            )
+                    channel: '#jenkinsslack',
+                    color: 'danger',
+                    message: 'Deployment a échoué'
+                )
+            }
         }
     }
 }
