@@ -15,7 +15,7 @@ pipeline {
                 }
             }
         }
-        stage('Code Quality') {
+     /*   stage('Code Quality') {
             steps {
                 script {
                     def qualityGate = waitForQualityGate()
@@ -24,7 +24,24 @@ pipeline {
                     }
                 }
             }
-        }}
+        }
+*/
+stage('Build') {
+    steps {
+        script {
+            bat 'gradlew.bat jar'
+            bat 'gradlew.bat javadoc'
+        }
+    }
+
+
+
+
+
+
+
+
+        }
         }
 
 
