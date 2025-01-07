@@ -35,6 +35,8 @@ sonarqube {
     property "sonar.qualitygate.timeout", "300"
     property "sonar.ws.timeout", "300"
     property "sonar.ce.timeout", "300"
+
+
   }
 }
 test {
