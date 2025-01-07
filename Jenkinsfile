@@ -52,7 +52,6 @@ pipeline {
 
     post {
         success {
-
             script {
              emailext (
                    subject: "Build Success: ${currentBuild.fullDisplayName}",
