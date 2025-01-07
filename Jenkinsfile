@@ -26,17 +26,21 @@ pipeline {
             }
         }
 */
- stage('Build Jar') {
+stage('Build Jar') {
             steps {
                 bat 'gradlew build'
             }
         }
-        stage('Generate Documentation') {
+
+
+stage('Generate Documentation') {
             steps {
                 bat 'gradlew generateJavadoc'
             }
         }
-  stage('Deploy') {
+
+
+stage('Deploy') {
             steps {
                 script {
                     bat 'gradlew.bat publish'
@@ -44,7 +48,39 @@ pipeline {
             }
         }
 
-}
+post {
+       success {
+         /*  mail(
+                 to: 'lb_benkhelifa@esi.dz',
+                 subject: 'Deployment Success - Project last ',
+                 body: 'The deployment for the project  was successful.'
+                 )*/
+           slackSend(
+                 channel: '#jenkinsslack',
+                 color: 'good',
+                 message: 'Deployment succeeded for project!'
+                 )
+
+       }
+       failure {
+          /* mail(
+                to: 'lb_benkhelifa@esi.dz',
+                subject: 'Pipeline Failed - Project last',
+                body: 'The Jenkins pipeline for project has failed. Please check the logs for more details.'
+                )*/
+           slackSend(
+                channel: '#jenkinsslack',
+                color: 'good',
+                message: 'Deployment failed for project !'
+                )
+
+
+       }
+  }
+
+
+
+  }
 }
 
 
