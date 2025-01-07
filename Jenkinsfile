@@ -15,7 +15,8 @@ pipeline {
                 }
             }
         }
-        stage("Code Quality") {
+
+        stage("Quality Gate") {
             steps {
                 script {
                     timeout(time: 3, unit: 'MINUTES') {
@@ -28,7 +29,6 @@ pipeline {
             }
         }
 
-
         stage('Build Jar') {
             steps {
                 bat 'gradlew build'
@@ -40,13 +40,13 @@ pipeline {
                 bat 'gradlew generateJavadoc'
             }
         }
-           stage('Archive Artifacts') {
-                    steps {
-                        archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
-                        archiveArtifacts artifacts: 'build/docs/javadoc/**/*', fingerprint: true
-                    }
-                }
 
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
+                archiveArtifacts artifacts: 'build/docs/javadoc/**/*', fingerprint: true
+            }
+        }
 
         stage('Deploy') {
             steps {
@@ -55,33 +55,46 @@ pipeline {
                 }
             }
         }
+
+        stage('Send Mail') {
+            steps {
+                script {
+                    emailext(
+                        subject: "Build Success: ${currentBuild.fullDisplayName}",
+                        body: """Build succeeded!""",
+                        to: 'lb_benkhelifa@esi.dz',
+                        mimeType: 'text/html',
+                        attachLog: true
+                    )
+                    echo "Email notification sent"
+                }
+            }
+        }
+
+        stage('Send Slack Notification') {
+            steps {
+                script {
+                    slackSend(
+                        channel: '#jenkinsslack',
+                        color: 'good',
+                        message: 'Deployment succeeded for project!'
+                    )
+                }
+            }
+        }
     }
 
     post {
-        success {
-            script {
-             emailext (
-                   subject: "Build Success: ${currentBuild.fullDisplayName}",
-                   body: """Build succeeded!""",
-                   to: 'lb_benkhelifa@esi.dz',
-                   mimeType: 'text/html',
-                   attachLog: true
-                   )
-                      echo "Email notification sent"
-                   }
-
-             slackSend(
-                    channel: '#jenkinsslack',
-                    color: 'good',
-                    message: 'Deployment succeeded for project!'
-                    )
-                     }
         failure {
-                slackSend(
-                channel: '#jenkinsslack',
-                color: 'danger',
-                message: 'Deployment failed for project!'
-            )
+            stage('Failure Notification') {
+                steps {
+                    slackSend(
+                        channel: '#jenkinsslack',
+                        color: 'danger',
+                        message: 'Deployment failed for project!'
+                    )
+                }
+            }
         }
     }
 }
